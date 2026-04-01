@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="AI-powered Sports Celebrity Image Classifier — Upload a photo and our ML model identifies famous sports personalities with confidence scores.">
+    <title>Sports Celebrity Classifier — AI Image Recognition</title>
+    <link rel="stylesheet" href="/static/app.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏆</text></svg>">
+</head>
+<body>
+
+    <!-- Animated Background -->
+    <div class="bg-particles"></div>
+
+    <!-- Navbar -->
+    <nav class="navbar" id="navbar">
+        <div class="navbar-inner">
+            <a href="/" class="navbar-brand">
+                <div class="navbar-logo">🏆</div>
+                <div>
+                    <div class="navbar-title">CelebVision AI</div>
+                </div>
+            </a>
+            <div class="navbar-status">
+                <div class="status-dot" id="status-dot"></div>
+                <span id="status-text">Initializing...</span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Container -->
+    <div class="main-container">
+
+        <!-- Hero Section -->
+        <section class="hero-section">
+            <div class="hero-badge">
+                ⚡ <span>Powered by SVM &amp; Computer Vision</span>
+            </div>
+            <h1 class="hero-title">
+                Identify Sports<br>
+                <span class="gradient-text">Celebrities Instantly</span>
+            </h1>
+            <p class="hero-subtitle">
+                Upload a photo of a sports celebrity and our AI model will identify who they are, with detailed confidence scores for each prediction.
+            </p>
+        </section>
+
+        <!-- App Grid -->
+        <div class="app-grid">
+
+            <!-- Upload Card -->
+            <div class="glass-card">
+                <div class="card-header">
+                    <div class="card-icon">📤</div>
+                    <div>
+                        <div class="card-title">Upload Image</div>
+                        <div class="card-subtitle">Drag & drop or click to browse</div>
+                    </div>
+                </div>
+
+                <!-- Upload Area (shown when no image) -->
+                <div class="upload-area" id="upload-area">
+                    <span class="upload-icon">🖼️</span>
+                    <p class="upload-text">
+                        Drop your image here or <a href="#" id="browse-link">browse files</a>
+                    </p>
+                    <p class="upload-hint">Supports JPG, PNG, GIF • Max 10MB</p>
+                </div>
+
+                <input type="file" id="file-input" accept="image/*">
+
+                <!-- Preview Container -->
+                <div class="preview-container" id="preview-container">
+                    <img src="" alt="Preview" class="preview-img" id="preview-img">
+                    <div class="preview-actions">
+                        <button class="btn btn-primary" id="classify-btn">
+                            <span id="classify-text">🔍 Classify Image</span>
+                            <div class="spinner" id="classify-spinner"></div>
+                        </button>
+                        <button class="btn btn-outline" id="clear-btn">✕ Clear</button>
+                    </div>
+                </div>
+
+                <!-- Message Box -->
+                <div class="message-box" id="message-box">
+                    <span id="message-icon">⚠️</span>
+                    <span id="message-text"></span>
+                </div>
+            </div>
+
+            <!-- Results Card -->
+            <div class="glass-card results-section">
+                <div class="card-header">
+                    <div class="card-icon alt">📊</div>
+                    <div>
+                        <div class="card-title">Classification Results</div>
+                        <div class="card-subtitle">AI prediction with confidence scores</div>
+                    </div>
+                </div>
+
+                <!-- Placeholder -->
+                <div id="results-placeholder" style="text-align: center; padding: 40px 0; color: var(--text-muted);">
+                    <div style="font-size: 48px; margin-bottom: 12px; opacity: 0.4;">🎯</div>
+                    <p style="font-size: 0.9rem;">Upload an image to see<br>classification results</p>
+                </div>
+
+                <!-- Result Card -->
+                <div class="result-card" id="result-card">
+                    <div class="result-main">
+                        <div class="result-label">Identified As</div>
+                        <div class="result-name" id="result-name">—</div>
+                        <span class="result-confidence-badge high" id="result-badge">
+                            <span id="badge-icon">✓</span>
+                            <span id="badge-text">—</span>
+                        </span>
+                    </div>
+
+                    <h3 style="font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 16px;">
+                        All Probabilities
+                    </h3>
+                    <ul class="probability-list" id="probability-list">
+                        <!-- Dynamically populated -->
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recognized Celebrities -->
+        <div class="glass-card" style="animation-delay: 0.45s;">
+            <div class="card-header">
+                <div class="card-icon">🌟</div>
+                <div>
+                    <div class="card-title">Recognized Celebrities</div>
+                    <div class="card-subtitle">Our model can identify these sports personalities</div>
+                </div>
+            </div>
+            <div class="celeb-grid" id="celeb-grid">
+                <!-- Populated dynamically -->
+            </div>
+        </div>
+
+        <!-- Info Section -->
+        <div class="info-section">
+            <div class="info-card">
+                <div class="info-card-icon">🧠</div>
+                <div class="info-card-title">SVM Classifier</div>
+                <div class="info-card-desc">Trained using Support Vector Machine with GridSearchCV for optimal hyperparameters</div>
+            </div>
+            <div class="info-card">
+                <div class="info-card-icon">👁️</div>
+                <div class="info-card-title">Face Detection</div>
+                <div class="info-card-desc">Uses OpenCV Haar Cascades for robust face and eye detection</div>
+            </div>
+            <div class="info-card">
+                <div class="info-card-icon">🌊</div>
+                <div class="info-card-title">Wavelet Features</div>
+                <div class="info-card-desc">Combines raw pixels with wavelet-transformed features for better accuracy</div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>Sports Celebrity Classifier • Powered by <a href="#">Flask</a> & <a href="#">scikit-learn</a></p>
+        </footer>
+    </div>
+
+    <script src="/static/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,26 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg-info/
+dist/
+build/
+venv/
+.env
+
+# macOS
+.DS_Store
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Dataset images (too large for git)
+ICP/images_dataset/
+ICP/cropped/
+ICP/cropped 2/
+ICP/test_images/
+
+# IDE
+.vscode/
+.idea/
