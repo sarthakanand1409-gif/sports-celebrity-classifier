@@ -1,7 +1,3 @@
-// ============================================
-// Sports Celebrity Image Classifier — Frontend
-// ============================================
-
 (() => {
     'use strict';
 
@@ -16,12 +12,10 @@
     const classifySpinner = document.getElementById('classify-spinner');
     const clearBtn        = document.getElementById('clear-btn');
     const messageBox      = document.getElementById('message-box');
-    const messageIcon     = document.getElementById('message-icon');
     const messageText     = document.getElementById('message-text');
     const resultCard      = document.getElementById('result-card');
     const resultName      = document.getElementById('result-name');
     const resultBadge     = document.getElementById('result-badge');
-    const badgeIcon       = document.getElementById('badge-icon');
     const badgeText       = document.getElementById('badge-text');
     const probabilityList = document.getElementById('probability-list');
     const resultsPlaceholder = document.getElementById('results-placeholder');
@@ -31,20 +25,20 @@
 
     let currentImageBase64 = null;
 
-    // ── Initialization ──
+    // ── Init ──
     document.addEventListener('DOMContentLoaded', () => {
         checkServerHealth();
         loadClasses();
         setupEventListeners();
     });
 
-    // ── Server Health Check ──
+    // ── Server Health ──
     async function checkServerHealth() {
         try {
             const res = await fetch('/api/health');
             if (res.ok) {
-                statusDot.style.background = 'var(--success)';
-                statusText.textContent = 'Model Ready';
+                statusDot.style.background = '#16a34a';
+                statusText.textContent = 'Ready';
             } else {
                 setStatusError();
             }
@@ -54,12 +48,11 @@
     }
 
     function setStatusError() {
-        statusDot.style.background = 'var(--error)';
-        statusDot.style.animation = 'none';
-        statusText.textContent = 'Server Offline';
+        statusDot.style.background = '#dc2626';
+        statusText.textContent = 'Offline';
     }
 
-    // ── Load Recognized Classes ──
+    // ── Load Classes ──
     async function loadClasses() {
         try {
             const res = await fetch('/api/get_classes');
@@ -74,51 +67,31 @@
 
     function renderCelebGrid(classDict) {
         celebGrid.innerHTML = '';
-        const sportEmojis = {
-            'maria_sharapova': '🎾',
-            'virat_kohli': '🏏',
-            'lionel_messi': '⚽',
-            'serena_williams': '🎾',
-            'roger_federer': '🎾'
-        };
-
         const sorted = Object.entries(classDict).sort((a, b) => a[1] - b[1]);
         sorted.forEach(([name, idx]) => {
             const chip = document.createElement('div');
             chip.className = 'celeb-chip';
-            const emoji = sportEmojis[name] || '⭐';
             const displayName = name.replace(/_/g, ' ');
-            chip.innerHTML = `
-                <span class="chip-number">${idx + 1}</span>
-                ${emoji} ${displayName}
-            `;
+            chip.innerHTML = `<span class="chip-number">${idx + 1}</span> ${displayName}`;
             celebGrid.appendChild(chip);
         });
     }
 
     // ── Event Listeners ──
     function setupEventListeners() {
-        // Browse link click
         browseLink.addEventListener('click', (e) => {
             e.preventDefault();
             fileInput.click();
         });
 
-        // Upload area click
         uploadArea.addEventListener('click', (e) => {
-            if (e.target !== browseLink) {
-                fileInput.click();
-            }
+            if (e.target !== browseLink) fileInput.click();
         });
 
-        // File input change
         fileInput.addEventListener('change', (e) => {
-            if (e.target.files && e.target.files[0]) {
-                handleFile(e.target.files[0]);
-            }
+            if (e.target.files && e.target.files[0]) handleFile(e.target.files[0]);
         });
 
-        // Drag and drop
         uploadArea.addEventListener('dragover', (e) => {
             e.preventDefault();
             uploadArea.classList.add('drag-over');
@@ -132,29 +105,21 @@
         uploadArea.addEventListener('drop', (e) => {
             e.preventDefault();
             uploadArea.classList.remove('drag-over');
-            if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-                handleFile(e.dataTransfer.files[0]);
-            }
+            if (e.dataTransfer.files && e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]);
         });
 
-        // Classify button
         classifyBtn.addEventListener('click', classifyImage);
-
-        // Clear button
         clearBtn.addEventListener('click', resetUI);
     }
 
     // ── File Handling ──
     function handleFile(file) {
-        // Validate file type
         if (!file.type.startsWith('image/')) {
-            showMessage('error', '⚠️', 'Please upload a valid image file (JPG, PNG, GIF).');
+            showMessage('error', 'Please upload a valid image file (JPG, PNG, GIF).');
             return;
         }
-
-        // Validate file size (10MB)
         if (file.size > 10 * 1024 * 1024) {
-            showMessage('error', '⚠️', 'File size exceeds 10MB. Please upload a smaller image.');
+            showMessage('error', 'File size exceeds 10MB.');
             return;
         }
 
@@ -169,7 +134,7 @@
         reader.readAsDataURL(file);
     }
 
-    // ── UI State Management ──
+    // ── UI State ──
     function showPreview() {
         uploadArea.style.display = 'none';
         previewContainer.classList.add('active');
@@ -180,9 +145,8 @@
         previewContainer.classList.remove('active');
     }
 
-    function showMessage(type, icon, text) {
+    function showMessage(type, text) {
         messageBox.className = `message-box active ${type}`;
-        messageIcon.textContent = icon;
         messageText.textContent = text;
     }
 
@@ -218,7 +182,7 @@
     // ── Classification ──
     async function classifyImage() {
         if (!currentImageBase64) {
-            showMessage('error', '⚠️', 'No image selected. Please upload an image first.');
+            showMessage('error', 'No image selected.');
             return;
         }
 
@@ -238,59 +202,46 @@
 
             if (data.success && data.result && data.result.length > 0) {
                 displayResults(data.result[0]);
-                showMessage('info', '✅', 'Classification complete! See results on the right.');
+                showMessage('success', 'Classification complete.');
             } else if (data.error) {
-                showMessage('error', '😕', data.error);
+                showMessage('error', data.error);
                 hideResults();
             } else {
-                showMessage('error', '⚠️', 'Unexpected response from server.');
+                showMessage('error', 'Unexpected response from server.');
                 hideResults();
             }
         } catch (err) {
             console.error('Classification error:', err);
-            showMessage('error', '❌', 'Network error. Make sure the server is running.');
+            showMessage('error', 'Network error. Is the server running?');
             hideResults();
         } finally {
             setLoading(false);
         }
     }
 
-    // ── Results Display ──
+    // ── Display Results ──
     function displayResults(result) {
-        // Set main prediction
         const predictedName = result.class.replace(/_/g, ' ');
         resultName.textContent = predictedName;
 
-        // Find the top probability
         const probs = result.class_probability;
         const topProb = probs.find(p => p.class === result.class);
         const topProbValue = topProb ? topProb.probability : 0;
 
-        // Set confidence badge
-        let badgeClass, badgeIconText;
-        if (topProbValue >= 70) {
-            badgeClass = 'high';
-            badgeIconText = '✓';
-        } else if (topProbValue >= 40) {
-            badgeClass = 'medium';
-            badgeIconText = '~';
-        } else {
-            badgeClass = 'low';
-            badgeIconText = '?';
-        }
+        let badgeClass;
+        if (topProbValue >= 70) badgeClass = 'high';
+        else if (topProbValue >= 40) badgeClass = 'medium';
+        else badgeClass = 'low';
 
-        resultBadge.className = `result-confidence-badge ${badgeClass}`;
-        badgeIcon.textContent = badgeIconText;
-        badgeText.textContent = `${topProbValue}% Confidence`;
+        resultBadge.className = `badge ${badgeClass}`;
+        badgeText.textContent = `${topProbValue}%`;
 
-        // Build probability bars
         probabilityList.innerHTML = '';
         const sortedProbs = [...probs].sort((a, b) => b.probability - a.probability);
 
         sortedProbs.forEach((p, index) => {
             const li = document.createElement('li');
             li.className = 'probability-item';
-
             const displayName = p.class.replace(/_/g, ' ');
             const isTop = index === 0;
 
@@ -305,12 +256,10 @@
             `;
             probabilityList.appendChild(li);
 
-            // Animate the bar after a short delay
             requestAnimationFrame(() => {
                 setTimeout(() => {
-                    const bar = li.querySelector('.probability-bar-fill');
-                    bar.style.width = `${p.probability}%`;
-                }, 50 + index * 100);
+                    li.querySelector('.probability-bar-fill').style.width = `${p.probability}%`;
+                }, 30 + index * 60);
             });
         });
 

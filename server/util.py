@@ -148,7 +148,7 @@ def w2d(img, mode='db1', level=5):
     """Wavelet transform for feature extraction."""
     import pywt
 
-    imArray = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
+    imArray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     # Convert to float
     imArray = np.float32(imArray)
     imArray /= 255.0
